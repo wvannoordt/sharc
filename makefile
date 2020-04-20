@@ -29,19 +29,22 @@ INCL += -I/usr/local/cuda/include
 LINKS := -lz
 LINKS += -L/usr/local/cuda/lib64 -lcudadevrt -lcudart
 
-COMPILE_TIME_OPT := -DMYVAR=4
+COMPILE_TIME_OPT := -DBLOCK_SIZE=32
+
+export ISHARC=-I${HDR_DIR}
+export LSHARC=-L${LIB_DIR} -l${LIB_TITLE}
 
 final: setup ${CUDA_OBJ} dlink ${HOST_OBJ}
 	${CC_HOST} -fPIC -shared ${HOST_OBJ} ${CUDA_OBJ} ${DLINK_OBJ} ${LINKS} -o ${LIB_TARGET}
 
-${HOST_OBJ}: ${OBJ_DIR}/%.o : $(dir ${HOST_SOURCE_FILES})%.cpp
-	${CC_HOST} ${INCL} ${COMPILE_TIME_OPT} -c $< -o $@
+${HOST_OBJ}: ${OBJ_DIR}/%.o : ${HOST_SOURCE}/%.cpp
+	${CC_HOST} -fPIC ${INCL} ${COMPILE_TIME_OPT} -c $< -o $@
 
 dlink:
 	${CC_CUDA} ${INCL} -Xcompiler -fPIC -rdc=true -dlink ${COMPILE_TIME_OPT} ${CUDA_OBJ} -o ${DLINK_OBJ} -lcudadevrt
 
-${CUDA_OBJ}: ${OBJ_DIR}/%.o : $(dir ${CUDA_SOURCE_FILES})%.cu
-	${CC_CUDA} -x cu -rdc=true -Xcompiler -fPIC ${COMPILE_TIME_OPT} -dc $< -o $@
+${CUDA_OBJ}: ${OBJ_DIR}/%.o : ${CUDA_SOURCE}/%.cu
+	${CC_CUDA} -x cu -rdc=true -Xcompiler -fPIC ${INCL} ${COMPILE_TIME_OPT} -dc $< -o $@
 
 setup:
 	-rm -r ${HDR_DIR}
@@ -56,3 +59,8 @@ clean:
 	-rm -r ${HDR_DIR}
 	-rm -r ${OBJ_DIR}
 	-rm -r ${LIB_DIR}
+
+test: clean final
+	for fldr in testing/* ; do \
+        ${MAKE} -C $${fldr} -f makefile -s test || exit 1; \
+    done

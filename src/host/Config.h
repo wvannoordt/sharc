@@ -5,4 +5,6 @@
 #define BLOCK_SIZE 32
 #endif
 
+typedef unsigned char ubyte;
+
 #endif
