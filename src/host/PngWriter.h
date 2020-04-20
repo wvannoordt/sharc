@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include "Typedef.h"
 
 namespace sharc
 {

@@ -8,6 +8,7 @@
 #include <vector>
 #include <assert.h>
 #include <cstring>
+#include "Typedef.h"
 
 namespace sharc
 {

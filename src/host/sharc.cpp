@@ -10,7 +10,8 @@ namespace sharc
     void SHARC_initialize(int argc, char** argv)
     {
         StlGeom r;
-        r.ReadFile("binball.stl");
+        r.ReadFromFile("binball.stl");
+        r.SavePointCloud("points.csv");
     }
     void SHARC_render(void)
     {
@@ -18,7 +19,7 @@ namespace sharc
     }
     void SHARC_gputest(void)
     {
-        //gpu_test();
+        gpu_test();
     }
     void SHARC_finalize(void)
     {

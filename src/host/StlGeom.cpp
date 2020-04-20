@@ -43,7 +43,18 @@ namespace sharc
         }
     }
 
-    void StlGeom::ReadFile(std::string filename)
+    void StlGeom::SavePointCloud(std::string filename)
+    {
+        std::ofstream myfile;
+		myfile.open (filename);
+        for (int i = 0; i < 3*facetCount; i++)
+        {
+            myfile << vertexdata[3*i+0] << ", " << vertexdata[3*i+1] << ", " << vertexdata[3*i+2] << "\n";
+        }
+        myfile.close();
+    }
+
+    void StlGeom::ReadFromFile(std::string filename)
     {
         if (!fileexists(filename)) SHARC_KILL_ASSERT("Cannot find file " << filename << ".");
         FILE* file_writer;
@@ -77,6 +88,22 @@ namespace sharc
             zmin = (vertexdata[9*i+2]<zmin)?vertexdata[9*i+2]:zmin;
             zmin = (vertexdata[9*i+5]<zmin)?vertexdata[9*i+5]:zmin;
             zmin = (vertexdata[9*i+8]<zmin)?vertexdata[9*i+8]:zmin;
+        }
+        fclose(file_writer);
+    }
+
+    void StlGeom::WriteToFile(std::string filename)
+    {
+        FILE* file_writer;
+        file_writer = fopen(filename.c_str(), "w+b");
+        fwrite(header, sizeof(char), STL_HDR_SIZE, file_writer);
+        fwrite(&facetCount, sizeof(int), 1, file_writer);
+        char dummy[2] = {0};
+        for (int i = 0; i < facetCount; i++)
+        {
+            fwrite(normaldata+3*i, sizeof(float), 3, file_writer);
+            fwrite(vertexdata+9*i, sizeof(float), 9, file_writer);
+            fwrite(dummy, sizeof(char), 2, file_writer);
         }
         fclose(file_writer);
     }

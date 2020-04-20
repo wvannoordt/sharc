@@ -8,12 +8,14 @@
 #define STL_HDR_SIZE 80
 namespace sharc
 {
-    class StlGeom
+    class StlGeom : public IIoObject
     {
         public:
             StlGeom(void);
             ~StlGeom(void);
-            void ReadFile(std::string filename);
+            void ReadFromFile(std::string filename);
+            void WriteToFile(std::string filename);
+            void SavePointCloud(std::string filename);
             int facetCount;
             char header[STL_HDR_SIZE];
             float xmin;

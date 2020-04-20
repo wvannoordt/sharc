@@ -10,7 +10,7 @@ namespace sharc
 	#define FRAC_XMAX -1.25046
 	#define FRAC_YMIN  0.02002
 	#define FRAC_YMAX  0.02022
-	#define FRAC_ITS 2600
+	#define FRAC_ITS 1600
 	#define FRAC_RATIO 0.4
     __global__ void K_gpu_test(int* imdata, const int wid, const int hei)
     {

@@ -2,6 +2,7 @@
 #define CRC32_H
 
 #include "Config.h"
+#include "Typedef.h"
 
 #define CRC32_TABLE_CT 256
 

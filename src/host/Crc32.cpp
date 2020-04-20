@@ -1,6 +1,7 @@
 #include "Crc32.h"
 #include "stdio.h"
 #include <iostream>
+#include "Typedef.h"
 
 namespace sharc
 {
