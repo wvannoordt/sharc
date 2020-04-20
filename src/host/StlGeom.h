@@ -16,6 +16,12 @@ namespace sharc
             void ReadFile(std::string filename);
             int facetCount;
             char header[STL_HDR_SIZE];
+            float xmin;
+            float xmax;
+            float ymin;
+            float ymax;
+            float zmin;
+            float zmax;
 
         private:
             bool require_free;

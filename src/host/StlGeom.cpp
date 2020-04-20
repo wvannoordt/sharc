@@ -26,6 +26,12 @@ namespace sharc
         if (machine_big_endian) SHARC_KILL_ASSERT("Detected big-endian machine: unable to convert from little-endian data for now.\nThis may cause undefined behavior.");
         require_free = false;
         facetCount = -999;
+        xmin =  1e30;
+        xmax = -1e30;
+        ymin =  1e30;
+        ymax = -1e30;
+        zmin =  1e30;
+        zmax = -1e30;
     }
 
     StlGeom::~StlGeom(void)
@@ -45,18 +51,14 @@ namespace sharc
         fread(header, sizeof(char), STL_HDR_SIZE, file_writer);
         fread(&facetCount, sizeof(int), 1, file_writer);
         allocate(facetCount);
-        float xmin =  1e30;
-        float xmax = -1e30;
-        float ymin =  1e30;
-        float ymax = -1e30;
-        float zmin =  1e30;
-        float zmax = -1e30;
+
         char dummy[2];
         for (int i = 0; i < facetCount; i++)
         {
             fread(normaldata+3*i, sizeof(float), 3, file_writer);
             fread(vertexdata+9*i, sizeof(float), 9, file_writer);
             fread(dummy, sizeof(char), 2, file_writer);
+
             xmax = (vertexdata[9*i+0]>xmax)?vertexdata[9*i+0]:xmax;
             xmax = (vertexdata[9*i+3]>xmax)?vertexdata[9*i+3]:xmax;
             xmax = (vertexdata[9*i+6]>xmax)?vertexdata[9*i+6]:xmax;
