@@ -1,6 +1,7 @@
 #ifndef SHARC_CU_H
 #define SHARC_CU_H
 
+#include "sharc.h"
 
 #define RED_SHIFT 0
 #define GRN_SHIFT 8
@@ -13,6 +14,9 @@
 namespace sharc
 {
     void cuda_finalize(void);
+    void cuda_allocate_frame_buffers(void);
+    void cuda_compute_shader(const int shader_id);
+    void offload_image_data(int* host_endpoint);
 }
 
 #endif

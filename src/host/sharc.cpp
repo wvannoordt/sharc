@@ -2,27 +2,57 @@
 #include "sharcCuda.h"
 #include "GpuTest.h"
 #include "ErrorCodes.h"
+#include "PngWriter.h"
 #include <iostream>
 #include <cstdlib>
 #include "StlGeom.h"
+#include "Typedef.h"
+
 namespace sharc
 {
-    void SHARC_initialize(int argc, char** argv)
+    SharcSettings userSettings;
+    PngWriter imWriter;
+    int* framebuf_host_endpoint;
+
+    void SHARC_Initialize(int argc, char** argv)
     {
-        StlGeom r;
-        r.ReadFromFile("binball.stl");
-        r.SavePointCloud("points.csv");
+        userSettings.Defaults();
     }
-    void SHARC_render(void)
+
+    void SHARC_AllocateFrameBuffers(void)
+    {
+        framebuf_host_endpoint = (int*)malloc(userSettings.width*userSettings.height*sizeof(int));
+        cuda_allocate_frame_buffers();
+    }
+
+    void SHARC_Render(void)
     {
 
     }
-    void SHARC_gputest(void)
+
+    void SHARC_Offload(void)
+    {
+        offload_image_data(framebuf_host_endpoint);
+    }
+
+    void SHARC_Write(std::string filename)
+    {
+        imWriter.write_png(filename.c_str(), userSettings.width, userSettings.height, framebuf_host_endpoint);
+    }
+
+    void SHARC_ComputeShader(const int shader_id)
+    {
+        cuda_compute_shader(shader_id);
+    }
+
+    void SHARC_GpuTest(void)
     {
         gpu_test();
     }
-    void SHARC_finalize(void)
+
+    void SHARC_Finalize(void)
     {
+        free(framebuf_host_endpoint);
         cuda_finalize();
     }
 
