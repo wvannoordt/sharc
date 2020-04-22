@@ -10,6 +10,19 @@
 #define SHARC_KILL_ASSERT(my_message) {std::cout << "SHARC_KILL_ASSERT called from file " << __FILE__ << ", line " <<  __LINE__ << std::endl; std::cout << my_message << std::endl; abort();}
 
 typedef unsigned char ubyte;
+typedef unsigned short uint16;
+
+#ifndef GEOM_PRECISION
+#define GEOM_PRECISION 1
+#endif
+
+#if(GEOM_PRECISION==2)
+typedef double g_real;
+#else
+typedef float g_real;
+#endif
+
+typedef unsigned short uint16;
 
 struct IIoObject
 {
@@ -26,10 +39,21 @@ struct IPackable
 struct SharcSettings : public IIoObject, public IPackable
 {
     int width, height;
+    int sky_color, floor_color;
+    float cam_x, cam_y, cam_z;
+    float cam_elev, cam_rot, zoom_aspect;
     void Defaults(void)
     {
         width = 1920;
         height = 1080;
+        cam_x = 0;
+        cam_y = 0;
+        cam_z = 0;
+        cam_elev = 0;
+        cam_rot = 0;
+        zoom_aspect = 1.7;
+        floor_color = 0x00a21273;
+        sky_color = 0x00dddddd;
     }
 
     bool fileexists(std::string name)
@@ -40,8 +64,16 @@ struct SharcSettings : public IIoObject, public IPackable
 
     void Pack(FILE* fh)
     {
-        fwrite(&(width),        sizeof(int),    1, fh);
-        fwrite(&(height),       sizeof(int),    1, fh);
+        fwrite(&(width),         sizeof(int),    1, fh);
+        fwrite(&(height),        sizeof(int),    1, fh);
+        fwrite(&(cam_x),         sizeof(float),  1, fh);
+        fwrite(&(cam_y),         sizeof(float),  1, fh);
+        fwrite(&(cam_z),         sizeof(float),  1, fh);
+        fwrite(&(cam_elev),      sizeof(float),  1, fh);
+        fwrite(&(cam_rot),       sizeof(float),  1, fh);
+        fwrite(&(zoom_aspect),   sizeof(float),  1, fh);
+        fwrite(&(floor_color),   sizeof(int),    1, fh);
+        fwrite(&(sky_color),     sizeof(int),    1, fh);
     }
 
     void Unpack(FILE* fh)
@@ -49,6 +81,14 @@ struct SharcSettings : public IIoObject, public IPackable
         Defaults();
         fread(&(width),          sizeof(int),    1, fh);
         fread(&(height),         sizeof(int),    1, fh);
+        fread(&(cam_x),          sizeof(float),  1, fh);
+        fread(&(cam_y),          sizeof(float),  1, fh);
+        fread(&(cam_z),          sizeof(float),  1, fh);
+        fread(&(cam_elev),       sizeof(float),  1, fh);
+        fread(&(cam_rot),        sizeof(float),  1, fh);
+        fread(&(zoom_aspect),    sizeof(float),  1, fh);
+        fread(&(floor_color),    sizeof(int),    1, fh);
+        fread(&(sky_color),      sizeof(int),    1, fh);
     }
 
     void ReadFromFile(std::string filename)

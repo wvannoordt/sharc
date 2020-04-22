@@ -16,7 +16,7 @@ namespace sharc
         void SHARC_ComputeShader(const int shader_id);
         void SHARC_Offload(void);
         void SHARC_Write(std::string filename);
-        void SHARC_Render(void);
+        void SHARC_SetRenderState(void);
         void SHARC_GpuTest(void);
         void SHARC_Finalize(void);
     }

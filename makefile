@@ -30,6 +30,7 @@ LINKS := -lz
 LINKS += -L/usr/local/cuda/lib64 -lcudadevrt -lcudart
 
 COMPILE_TIME_OPT := -DBLOCK_SIZE=32
+COMPILE_TIME_OPT += -DGEOM_PRECISION=1
 
 export ISHARC=-I${HDR_DIR}
 export LSHARC=-L${LIB_DIR} -l${LIB_TITLE}
@@ -59,6 +60,9 @@ clean:
 	-rm -r ${HDR_DIR}
 	-rm -r ${OBJ_DIR}
 	-rm -r ${LIB_DIR}
+	for fldr in testing/* ; do \
+        ${MAKE} -C $${fldr} -f makefile clean || exit 1; \
+    done
 
 test: clean final
 	for fldr in testing/* ; do \

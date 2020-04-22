@@ -72,6 +72,7 @@ namespace sharc
         dim3 block(BLOCK_SIZE, BLOCK_SIZE);
 
         K_gpu_test<<<grid, block>>>(d_image_data, wid, hei);
+        CU_CHK(cudaPeekAtLastError());
         CU_CHK(cudaDeviceSynchronize());
         CU_CHK(cudaMemcpy(imdata, d_image_data, wid*hei*sizeof(int), cudaMemcpyDeviceToHost));
         CU_CHK(cudaFree(d_image_data));

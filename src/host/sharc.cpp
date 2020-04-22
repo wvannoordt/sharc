@@ -17,6 +17,7 @@ namespace sharc
     void SHARC_Initialize(int argc, char** argv)
     {
         userSettings.Defaults();
+        cuda_set_render_state();
     }
 
     void SHARC_AllocateFrameBuffers(void)
@@ -25,9 +26,9 @@ namespace sharc
         cuda_allocate_frame_buffers();
     }
 
-    void SHARC_Render(void)
+    void SHARC_SetRenderState(void)
     {
-
+        cuda_set_render_state();
     }
 
     void SHARC_Offload(void)
