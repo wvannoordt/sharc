@@ -22,6 +22,8 @@ typedef double g_real;
 typedef float g_real;
 #endif
 
+typedef float vec3[3];
+
 typedef unsigned short uint16;
 
 struct IIoObject
@@ -42,6 +44,8 @@ struct SharcSettings : public IIoObject, public IPackable
     int sky_color, floor_color;
     float cam_x, cam_y, cam_z;
     float cam_elev, cam_rot, zoom_aspect;
+    bool rdr_floor;
+    float floor_height;
     void Defaults(void)
     {
         width = 1920;
@@ -54,6 +58,8 @@ struct SharcSettings : public IIoObject, public IPackable
         zoom_aspect = 1.7;
         floor_color = 0x00a21273;
         sky_color = 0x00dddddd;
+        rdr_floor = true;
+        floor_height = -10;
     }
 
     bool fileexists(std::string name)
@@ -74,6 +80,8 @@ struct SharcSettings : public IIoObject, public IPackable
         fwrite(&(zoom_aspect),   sizeof(float),  1, fh);
         fwrite(&(floor_color),   sizeof(int),    1, fh);
         fwrite(&(sky_color),     sizeof(int),    1, fh);
+        fwrite(&(rdr_floor),     sizeof(bool),   1, fh);
+        fwrite(&(floor_height),  sizeof(float),  1, fh);
     }
 
     void Unpack(FILE* fh)
@@ -89,6 +97,8 @@ struct SharcSettings : public IIoObject, public IPackable
         fread(&(zoom_aspect),    sizeof(float),  1, fh);
         fread(&(floor_color),    sizeof(int),    1, fh);
         fread(&(sky_color),      sizeof(int),    1, fh);
+        fread(&(rdr_floor),      sizeof(bool),   1, fh);
+        fread(&(floor_height),   sizeof(float),  1, fh);
     }
 
     void ReadFromFile(std::string filename)

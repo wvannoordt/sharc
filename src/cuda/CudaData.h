@@ -5,7 +5,8 @@
 namespace sharc
 {
     //camera position
-    extern __device__ float cam_x, cam_y, cam_z, elev_cos, elev_sin, rot_cos, rot_sin, zoom, cam_n1, cam_n2, cam_n3, screen_aspect;
+    extern __device__ float cam_x, cam_y, cam_z, elev_cos, elev_sin, rot_cos, rot_sin, zoom, cam_n1, cam_n2, cam_n3, screen_aspect, floor_height;
+    extern __device__ bool rdr_floor;
 
     extern int H_skybackground, H_floorbackground;
     extern __device__ int skybackground, floorbackground;

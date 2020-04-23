@@ -4,7 +4,8 @@
 namespace sharc
 {
     //camera position
-    __device__ float cam_x, cam_y, cam_z, elev_cos, elev_sin, rot_cos, rot_sin, zoom, cam_n1, cam_n2, cam_n3, screen_aspect;
+    __device__ float cam_x, cam_y, cam_z, elev_cos, elev_sin, rot_cos, rot_sin, zoom, cam_n1, cam_n2, cam_n3, screen_aspect, floor_height;
+    __device__ bool rdr_floor;
 
     __device__ int skybackground, floorbackground;
 
@@ -79,6 +80,9 @@ namespace sharc
         CU_CHK(cudaMemcpyToSymbol(cam_x, &(settings->cam_x),  sizeof(float), 0));
         CU_CHK(cudaMemcpyToSymbol(cam_y, &(settings->cam_y),  sizeof(float), 0));
         CU_CHK(cudaMemcpyToSymbol(cam_z, &(settings->cam_z),  sizeof(float), 0));
+
+        CU_CHK(cudaMemcpyToSymbol(rdr_floor,    &(settings->rdr_floor),  sizeof(bool), 0));
+        CU_CHK(cudaMemcpyToSymbol(floor_height, &(settings->floor_height),  sizeof(float), 0));
 
         CU_CHK(cudaMemcpyToSymbol(cam_n1, &(H_cam_n1),  sizeof(float), 0));
         CU_CHK(cudaMemcpyToSymbol(cam_n2, &(H_cam_n2),  sizeof(float), 0));

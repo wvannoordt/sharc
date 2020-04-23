@@ -13,7 +13,6 @@ main:
 
 clean:
 	-rm ${EXE}
-	-rm *.png
 
 test: clean main
 	./${EXE}
