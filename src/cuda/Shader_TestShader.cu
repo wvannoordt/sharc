@@ -3,6 +3,7 @@
 #include "CudaErrorLogging.h"
 #include "sharcCuda.h"
 #include "Shader_TestShader.h"
+#include "CuGLInterop.h"
 namespace sharc
 {
     __global__ void K_rdr_test_shader()
@@ -14,9 +15,9 @@ namespace sharc
         r = (float)((blockIdx.y + blockIdx.x)%2);
         g = 0.0;
         b = (float)((blockIdx.y/2 + blockIdx.x/2)%2);
-        if (i < i_bound && j < j_bound)
+        if (i < layers.Ni && j < layers.Nj)
 		{
-            *(imdata + i*j_bound+j) = rgb2int(r, g, b);
+            *(layers.imdata + i*layers.Nj+j) = rgb2int(r, g, b);
 		}
     }
 

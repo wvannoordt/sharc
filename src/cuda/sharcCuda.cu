@@ -38,7 +38,7 @@ namespace sharc
 
     void offload_image_data(int* host_endpoint)
     {
-        CU_CHK(cudaMemcpy(host_endpoint, H_imdata, userSettings.width * userSettings.height * sizeof(int), cudaMemcpyDeviceToHost));
+        CU_CHK(cudaMemcpy(host_endpoint, shaderLayers.imdata, userSettings.width * userSettings.height * sizeof(int), cudaMemcpyDeviceToHost));
     }
 
     void cuda_finalize(void)

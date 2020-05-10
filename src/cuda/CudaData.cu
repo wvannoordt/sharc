@@ -3,98 +3,60 @@
 #include "Typedef.h"
 namespace sharc
 {
-    //camera position
-    __device__ float cam_x, cam_y, cam_z, elev_cos, elev_sin, rot_cos, rot_sin, zoom, cam_n1, cam_n2, cam_n3, screen_aspect, floor_height;
-    __device__ bool rdr_floor;
+    __device__ SharcSettings settings;
+    __device__ SharcShaderLayers layers;dim3 grid_conf, block_conf;
 
-    __device__ int skybackground, floorbackground;
+    __global__ void K_settings(SharcSettings s)
+    {
+        settings = s;
+    }
 
-    dim3 grid_conf, block_conf;
-    int* H_imdata;
-
-    //image data
-    __device__ int* imdata;
-    __device__ int i_bound, j_bound;
-
-    ////////shader buffer layers
-    //incident coordinates
-    g_real *H_x_inc, *H_y_inc, *H_z_inc;
-    __device__ g_real *x_inc, *y_inc, *z_inc;
-
-    //incident normals
-    float *H_n1_inc, *H_n2_inc, *H_n3_inc;
-    __device__ float *n1_inc, *n2_inc, *n3_inc;
-
-    //buffer indices
-    uint16* H_ob_id;
-    __device__ uint16* ob_id;
+    __global__ void K_layers(SharcShaderLayers s)
+    {
+        layers = s;
+    }
 
     void allocate_frame_bufs(int wid, int hei)
     {
-        CU_CHK(cudaMemcpyToSymbol(j_bound, &(userSettings.width),  sizeof(int), 0));
-        CU_CHK(cudaMemcpyToSymbol(i_bound, &(userSettings.height), sizeof(int), 0));
-
-        CU_CHK(cudaMalloc((void**)(&H_imdata), wid * hei * sizeof(int)));
-        CU_CHK(cudaMemcpyToSymbol(imdata, &(H_imdata), sizeof(int*), 0));
-
-        CU_CHK(cudaMalloc((void**)(&H_x_inc), wid * hei * sizeof(g_real)));
-        CU_CHK(cudaMemcpyToSymbol(x_inc, &(H_x_inc), sizeof(g_real*), 0));
-
-        CU_CHK(cudaMalloc((void**)(&H_y_inc), wid * hei * sizeof(g_real)));
-        CU_CHK(cudaMemcpyToSymbol(y_inc, &(H_y_inc), sizeof(g_real*), 0));
-
-        CU_CHK(cudaMalloc((void**)(&H_z_inc), wid * hei * sizeof(g_real)));
-        CU_CHK(cudaMemcpyToSymbol(z_inc, &(H_z_inc), sizeof(g_real*), 0));
-
-        CU_CHK(cudaMalloc((void**)(&H_ob_id), wid * hei * sizeof(uint16)));
-        CU_CHK(cudaMemcpyToSymbol(ob_id, &(H_ob_id), sizeof(uint16*), 0));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.imdata)),        wid * hei * sizeof(uchar4)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[0])), wid * hei * sizeof(g_real)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[1])), wid * hei * sizeof(g_real)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[2])), wid * hei * sizeof(g_real)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_n[0])), wid * hei * sizeof(float)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_n[1])), wid * hei * sizeof(float)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_n[2])), wid * hei * sizeof(float)));
+        CU_CHK(cudaMalloc((void**)(&(shaderLayers.object_id)),     wid * hei * sizeof(uint16)));
+        shaderLayers.Nj = wid;
+        shaderLayers.Ni = hei;
 
         int num_blocks_w = (userSettings.width  + (BLOCK_SIZE-1))/BLOCK_SIZE;
         int num_blocks_h = (userSettings.height + (BLOCK_SIZE-1))/BLOCK_SIZE;
         grid_conf =  dim3(num_blocks_w, num_blocks_h);
         block_conf = dim3(BLOCK_SIZE, BLOCK_SIZE);
+        K_layers<<<1,1>>>(shaderLayers);
     }
 
     void free_frame_bufs(void)
     {
-        CU_CHK(cudaFree(H_imdata));
-        CU_CHK(cudaFree(H_x_inc));
-        CU_CHK(cudaFree(H_y_inc));
-        CU_CHK(cudaFree(H_z_inc));
-        CU_CHK(cudaFree(H_ob_id));
+        CU_CHK(cudaFree(shaderLayers.imdata));
+        CU_CHK(cudaFree(shaderLayers.incident_x[0]));
+        CU_CHK(cudaFree(shaderLayers.incident_x[1]));
+        CU_CHK(cudaFree(shaderLayers.incident_x[2]));
+        CU_CHK(cudaFree(shaderLayers.incident_n[0]));
+        CU_CHK(cudaFree(shaderLayers.incident_n[1]));
+        CU_CHK(cudaFree(shaderLayers.incident_n[2]));
+        CU_CHK(cudaFree(shaderLayers.object_id));
     }
 
-    void set_render_state(SharcSettings* settings)
+    void set_render_state(SharcSettings* settings_in)
     {
-        float s_elev = sin(settings->cam_elev);
-        float c_elev = cos(settings->cam_elev);
-        float s_rot  = sin(settings->cam_rot);
-        float c_rot  = cos(settings->cam_rot);
-        float H_cam_n1 = c_elev*c_rot;
-        float H_cam_n2 = c_elev*s_rot;
-        float H_cam_n3 = s_elev;
-        float scr_asp = (float)((double)userSettings.height / (double)userSettings.width);
-
-        CU_CHK(cudaMemcpyToSymbol(screen_aspect, &(scr_asp),  sizeof(float), 0));
-
-        CU_CHK(cudaMemcpyToSymbol(cam_x, &(settings->cam_x),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(cam_y, &(settings->cam_y),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(cam_z, &(settings->cam_z),  sizeof(float), 0));
-
-        CU_CHK(cudaMemcpyToSymbol(rdr_floor,    &(settings->rdr_floor),  sizeof(bool), 0));
-        CU_CHK(cudaMemcpyToSymbol(floor_height, &(settings->floor_height),  sizeof(float), 0));
-
-        CU_CHK(cudaMemcpyToSymbol(cam_n1, &(H_cam_n1),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(cam_n2, &(H_cam_n2),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(cam_n3, &(H_cam_n3),  sizeof(float), 0));
-
-        CU_CHK(cudaMemcpyToSymbol(elev_sin, &(s_elev),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(elev_cos, &(c_elev),  sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(rot_sin,  &(s_rot),   sizeof(float), 0));
-        CU_CHK(cudaMemcpyToSymbol(rot_cos,  &(c_rot),   sizeof(float), 0));
-
-        CU_CHK(cudaMemcpyToSymbol(skybackground,    &(settings->sky_color),     sizeof(int),   0));
-        CU_CHK(cudaMemcpyToSymbol(floorbackground,  &(settings->floor_color),   sizeof(int),   0));
-        CU_CHK(cudaMemcpyToSymbol(zoom,             &(settings->zoom_aspect),   sizeof(float), 0));
+        settings_in->elev_sin = sin(settings_in->cam_elev);
+        settings_in->elev_cos = cos(settings_in->cam_elev);
+        settings_in->rot_sin  = sin(settings_in->cam_rot);
+        settings_in->rot_cos  = cos(settings_in->cam_rot);
+        settings_in->cam_n[0] = (settings_in->elev_cos)*(settings_in->rot_cos);
+        settings_in->cam_n[1] = (settings_in->elev_cos)*(settings_in->rot_sin);
+        settings_in->cam_n[2] = (settings_in->elev_sin);
+        K_settings<<<1,1>>>(*settings_in);
     }
 }

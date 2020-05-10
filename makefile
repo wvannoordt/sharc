@@ -26,14 +26,15 @@ INCL := -I${HDR_DIR}
 INCL += -I/usr/local/cuda/include
 
 
+
 LINKS := -lz
 LINKS += -L/usr/local/cuda/lib64 -lcudadevrt -lcudart
 
 COMPILE_TIME_OPT := -DBLOCK_SIZE=32
 COMPILE_TIME_OPT += -DGEOM_PRECISION=1
 
-export ISHARC=-I${HDR_DIR}
-export LSHARC=-L${LIB_DIR} -l${LIB_TITLE}
+export ISHARC=-I${HDR_DIR} ${INCL}
+export LSHARC=-L${LIB_DIR} -l${LIB_TITLE} ${LINKS}
 
 final: setup ${CUDA_OBJ} dlink ${HOST_OBJ}
 	${CC_HOST} -fPIC -shared ${HOST_OBJ} ${CUDA_OBJ} ${DLINK_OBJ} ${LINKS} -o ${LIB_TARGET}

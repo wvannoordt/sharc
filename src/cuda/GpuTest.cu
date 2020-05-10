@@ -4,6 +4,7 @@
 #include "CudaErrorLogging.h"
 #include "sharcCuda.h"
 #include "PngWriter.h"
+#include "CuGLInterop.h"
 namespace sharc
 {
     #define FRAC_XMIN -1.25086

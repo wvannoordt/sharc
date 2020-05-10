@@ -7,16 +7,20 @@
 #include <cstdlib>
 #include "StlGeom.h"
 #include "Typedef.h"
+#include "SharcUserSettingsHandle.h"
 
 namespace sharc
 {
     SharcSettings userSettings;
+    SharcShaderLayers shaderLayers;
+    SharcUserSettingsHandle userSettingsHandle;
     PngWriter imWriter;
     int* framebuf_host_endpoint;
 
     void SHARC_Initialize(int argc, char** argv)
     {
-        userSettings.Defaults();
+        userSettingsHandle = SharcUserSettingsHandle(&userSettings);
+        userSettingsHandle.Defaults();
         cuda_set_render_state();
     }
 

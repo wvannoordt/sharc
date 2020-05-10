@@ -5,10 +5,13 @@
 #include "ErrorCodes.h"
 #include "GpuTest.h"
 #include "Typedef.h"
+#include "SharcUserSettingsHandle.h"
 
 namespace sharc
 {
     extern SharcSettings userSettings;
+    extern SharcShaderLayers shaderLayers;
+    extern SharcUserSettingsHandle userSettingsHandle;
     extern "C"
     {
         void SHARC_Initialize(int argc, char** argv);
