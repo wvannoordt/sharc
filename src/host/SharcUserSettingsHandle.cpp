@@ -21,8 +21,8 @@ namespace sharc
         child->cam_elev = 0;
         child->cam_rot = 0;
         child->zoom_aspect = 1.7;
-        child->floor_color = 0x00a21273;
-        child->sky_color = 0x00dddddd;
+        child->floor_color = 0xffa21273;
+        child->sky_color = 0xffdddddd;
         child->rdr_floor = true;
         child->floor_height = -10;
     }

@@ -23,7 +23,7 @@ namespace sharc
                 floorx = (int)floor((0.1*(trav*norm[0]+settings.cam_x)));
                 floory = (int)floor((0.1*(trav*norm[1]+settings.cam_y)));
                 floorx += floory;
-                if ((floorx%2==0)==floorx<0) *(layers.imdata + i*layers.Nj+j) = 0x00341989;
+                if ((floorx%2==0)==floorx<0) *(layers.imdata + i*layers.Nj+j) = 0xff341989;
                 if (abs((0.1*(trav*norm[1]+settings.cam_y))) < 1e-2 || abs((0.1*(trav*norm[0]+settings.cam_x))) < 1e-2) *(layers.imdata + i*layers.Nj+j) = 0;
             }
 		}

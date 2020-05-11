@@ -8,6 +8,7 @@
 #include "StlGeom.h"
 #include "Typedef.h"
 #include "SharcUserSettingsHandle.h"
+#include "SharcGL.h"
 
 namespace sharc
 {
@@ -16,18 +17,51 @@ namespace sharc
     SharcUserSettingsHandle userSettingsHandle;
     PngWriter imWriter;
     int* framebuf_host_endpoint;
+    int hostArgc;
+    char** hostArgv;
+    GLuint pbo = 0;     // OpenGL pixel buffer object
+    GLuint tex = 0;     // OpenGL texture object
+    struct cudaGraphicsResource *cuda_pbo_resource;
+    bool interactiveMode;
+    bool finalizeCalled;
 
     void SHARC_Initialize(int argc, char** argv)
     {
         userSettingsHandle = SharcUserSettingsHandle(&userSettings);
         userSettingsHandle.Defaults();
         cuda_set_render_state();
+        hostArgc = argc;
+        hostArgv = argv;
+        finalizeCalled = true;
+        interactiveMode = false;
+    }
+
+    void SHARC_SetInteractiveMode(bool a)
+    {
+        interactiveMode = a;
+    }
+
+    void SHARC_CreateOGL(const char* title)
+    {
+        if (!interactiveMode) erkill(SHARC_ERR_OGL_SPEC, "SHARC_CreateOGL called in non-interactive mode: call SHARC_SetInteractiveMode(true) beforehand.");
+        SharcGLInit(hostArgc, hostArgv, title);
     }
 
     void SHARC_AllocateFrameBuffers(void)
     {
         framebuf_host_endpoint = (int*)malloc(userSettings.width*userSettings.height*sizeof(int));
         cuda_allocate_frame_buffers();
+    }
+
+    void SHARC_SetSize(int w, int h)
+    {
+        userSettings.width  = w;
+        userSettings.height = h;
+    }
+
+    void SHARC_OGLWindowStart(void)
+    {
+        SharcGLWindow();
     }
 
     void SHARC_SetRenderState(void)
@@ -57,8 +91,12 @@ namespace sharc
 
     void SHARC_Finalize(void)
     {
-        free(framebuf_host_endpoint);
-        cuda_finalize();
+        if (!finalizeCalled)
+        {
+            finalizeCalled = true;
+            free(framebuf_host_endpoint);
+            cuda_finalize();
+        }
     }
 
     void reg_error(const char* message, const char* file, const int line, const int error_code)

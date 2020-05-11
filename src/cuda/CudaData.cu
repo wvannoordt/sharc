@@ -1,10 +1,12 @@
 #include "CudaData.h"
 #include "CudaErrorLogging.h"
 #include "Typedef.h"
+#include "sharc.h"
 namespace sharc
 {
     __device__ SharcSettings settings;
-    __device__ SharcShaderLayers layers;dim3 grid_conf, block_conf;
+    __device__ SharcShaderLayers layers;
+    dim3 grid_conf, block_conf;
 
     __global__ void K_settings(SharcSettings s)
     {
@@ -18,7 +20,7 @@ namespace sharc
 
     void allocate_frame_bufs(int wid, int hei)
     {
-        CU_CHK(cudaMalloc((void**)(&(shaderLayers.imdata)),        wid * hei * sizeof(uchar4)));
+        if (!interactiveMode) CU_CHK(cudaMalloc((void**)(&(shaderLayers.imdata)), wid * hei * sizeof(int)));
         CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[0])), wid * hei * sizeof(g_real)));
         CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[1])), wid * hei * sizeof(g_real)));
         CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[2])), wid * hei * sizeof(g_real)));
@@ -58,5 +60,15 @@ namespace sharc
         settings_in->cam_n[1] = (settings_in->elev_cos)*(settings_in->rot_sin);
         settings_in->cam_n[2] = (settings_in->elev_sin);
         K_settings<<<1,1>>>(*settings_in);
+    }
+
+    __global__ void K_OGL_framebuffer(int* buf)
+    {
+        layers.imdata = buf;
+    }
+
+    void override_OGL_framebuf(int* newBuf)
+    {
+        K_OGL_framebuffer<<<1,1>>>(newBuf);
     }
 }
