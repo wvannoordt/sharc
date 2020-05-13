@@ -18,7 +18,7 @@ namespace sharc
         int num = 1;
         machine_big_endian = ! ( *(char *)&num == 1 );
     }
-    void PngWriter::write_png(const char* filename_png_ext, const int& width, const int& height, int* imdata)
+    void PngWriter::WritePng(const char* filename_png_ext, const int& width, const int& height, int* imdata)
     {
         FILE* file_writer;
         file_writer = fopen(filename_png_ext, "w+b");

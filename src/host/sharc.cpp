@@ -29,7 +29,7 @@ namespace sharc
     {
         userSettingsHandle = SharcUserSettingsHandle(&userSettings);
         userSettingsHandle.Defaults();
-        cuda_set_render_state();
+        CudaSetRenderState();
         hostArgc = argc;
         hostArgv = argv;
         finalizeCalled = true;
@@ -50,7 +50,7 @@ namespace sharc
     void SHARC_AllocateFrameBuffers(void)
     {
         framebuf_host_endpoint = (int*)malloc(userSettings.width*userSettings.height*sizeof(int));
-        cuda_allocate_frame_buffers();
+        CudaAllocateFrameBuffers();
     }
 
     void SHARC_SetSize(int w, int h)
@@ -66,27 +66,27 @@ namespace sharc
 
     void SHARC_SetRenderState(void)
     {
-        cuda_set_render_state();
+        CudaSetRenderState();
     }
 
     void SHARC_Offload(void)
     {
-        offload_image_data(framebuf_host_endpoint);
+        OffloadImageData(framebuf_host_endpoint);
     }
 
     void SHARC_Write(std::string filename)
     {
-        imWriter.write_png(filename.c_str(), userSettings.width, userSettings.height, framebuf_host_endpoint);
+        imWriter.WritePng(filename.c_str(), userSettings.width, userSettings.height, framebuf_host_endpoint);
     }
 
     void SHARC_ComputeShader(const int shader_id)
     {
-        cuda_compute_shader(shader_id);
+        CudaComputeShader(shader_id);
     }
 
     void SHARC_GpuTest(void)
     {
-        gpu_test();
+        GpuTest();
     }
 
     void SHARC_Finalize(void)
@@ -95,7 +95,7 @@ namespace sharc
         {
             finalizeCalled = true;
             free(framebuf_host_endpoint);
-            cuda_finalize();
+            CudaFinalize();
         }
     }
 

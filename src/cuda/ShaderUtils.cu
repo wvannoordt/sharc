@@ -3,7 +3,7 @@
 #include "CuGLInterop.h"
 namespace sharc
 {
-    __device__ void get_cam_normals(const int& i, const int& j, vec3& n)
+    __device__ void GetCamNormals(const int& i, const int& j, vec3& n)
     {
         float screen_xyz;
         float i_portion = 0.5 - ((float)i)/(layers.Ni-1);

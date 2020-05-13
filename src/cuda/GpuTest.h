@@ -5,6 +5,6 @@
 #include "sharc.h"
 namespace sharc
 {
-    void gpu_test(void);
+    void GpuTest(void);
 }
 #endif

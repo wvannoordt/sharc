@@ -3,7 +3,7 @@
 
 namespace sharc
 {
-    void shader_testshader(void);
+    void Shader_TestShader(void);
 }
 
 #endif

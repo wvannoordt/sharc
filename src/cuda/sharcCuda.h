@@ -14,11 +14,11 @@
 
 namespace sharc
 {
-    void cuda_finalize(void);
-    void cuda_allocate_frame_buffers(void);
-    void cuda_compute_shader(const int shader_id);
-    void offload_image_data(int* host_endpoint);
-    void cuda_set_render_state(void);
+    void CudaFinalize(void);
+    void CudaAllocateFrameBuffers(void);
+    void CudaComputeShader(const int shader_id);
+    void OffloadImageData(int* host_endpoint);
+    void CudaSetRenderState(void);
 }
 
 #endif

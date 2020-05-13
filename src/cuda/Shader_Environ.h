@@ -3,7 +3,7 @@
 
 namespace sharc
 {
-    void shader_environ(void);
+    void Shader_Environ(void);
 }
 
 #endif

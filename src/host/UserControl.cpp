@@ -6,6 +6,27 @@ namespace sharc
 {
     void OnKeyPress(unsigned char key, int x, int y)
     {
+
+        if (key == 'w')
+        {
+            userSettings.cam_x += 1.0*userSettings.cam_n[0];
+            userSettings.cam_y += 1.0*userSettings.cam_n[1];
+            userSettings.cam_z += 1.0*userSettings.cam_n[2];
+        }
+        if (key == 's')
+        {
+            userSettings.cam_x -= 1.0*userSettings.cam_n[0];
+            userSettings.cam_y -= 1.0*userSettings.cam_n[1];
+            userSettings.cam_z -= 1.0*userSettings.cam_n[2];
+        }
+        if (key == 'a')
+        {
+            userSettings.cam_rot += 0.05;
+        }
+        if (key == 'd')
+        {
+            userSettings.cam_rot -= 0.05;
+        }
         glutPostRedisplay();
     }
 
@@ -27,10 +48,7 @@ namespace sharc
 
     void OnSpecialKeyPress(int key, int x, int y)
     {
-        /*if (key == GLUT_KEY_LEFT)  loc.x -= DELTA;
-        if (key == GLUT_KEY_RIGHT) loc.x += DELTA;
-        if (key == GLUT_KEY_UP)    loc.y -= DELTA;
-        if (key == GLUT_KEY_DOWN)  loc.y += DELTA;*/
+        //special keys
         glutPostRedisplay();
     }
 
@@ -39,9 +57,8 @@ namespace sharc
         int* oglDeviceBuf = 0;
         cudaGraphicsMapResources(1, &cuda_pbo_resource, 0);
         cudaGraphicsResourceGetMappedPointer((void **)&(oglDeviceBuf), NULL, cuda_pbo_resource);
-        userSettings.cam_rot += 0.01;
         SHARC_SetRenderState();
-        override_OGL_framebuf(oglDeviceBuf);
+        OverrideOGLFrameBuffer(oglDeviceBuf);
 
         //This is where a list of shaders would be built
         SHARC_ComputeShader(SHARC_SHDR_ENVIRON);

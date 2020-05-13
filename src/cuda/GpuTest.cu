@@ -13,7 +13,7 @@ namespace sharc
 	#define FRAC_YMAX  0.02022
 	#define FRAC_ITS 1600
 	#define FRAC_RATIO 0.4
-    __global__ void K_gpu_test(int* imdata, const int wid, const int hei)
+    __global__ void K_GpuTest(int* imdata, const int wid, const int hei)
     {
         int row = blockIdx.y*blockDim.y + threadIdx.y;
 		int col = blockIdx.x*blockDim.x + threadIdx.x;
@@ -58,7 +58,7 @@ namespace sharc
 		}
     }
 
-    void gpu_test(void)
+    void GpuTest(void)
     {
         int wid = SHARC_TEST_WID;
         int hei = SHARC_TEST_HEI;
@@ -72,13 +72,13 @@ namespace sharc
         dim3 grid(num_blocks_w, num_blocks_h);
         dim3 block(BLOCK_SIZE, BLOCK_SIZE);
 
-        K_gpu_test<<<grid, block>>>(d_image_data, wid, hei);
+        K_GpuTest<<<grid, block>>>(d_image_data, wid, hei);
         CU_CHK(cudaPeekAtLastError());
         CU_CHK(cudaDeviceSynchronize());
         CU_CHK(cudaMemcpy(imdata, d_image_data, wid*hei*sizeof(int), cudaMemcpyDeviceToHost));
         CU_CHK(cudaFree(d_image_data));
         PngWriter p;
-        p.write_png("fractaltest.png", wid, hei, imdata);
+        p.WritePng("fractaltest.png", wid, hei, imdata);
         free(imdata);
     }
 }

@@ -6,7 +6,7 @@ namespace sharc
 {
     __device__ SharcSettings settings;
     __device__ SharcShaderLayers layers;
-    dim3 grid_conf, block_conf;
+    dim3 gridConf, blockConf;
 
     __global__ void K_settings(SharcSettings s)
     {
@@ -18,7 +18,7 @@ namespace sharc
         layers = s;
     }
 
-    void allocate_frame_bufs(int wid, int hei)
+    void AllocateFrameBuffers(int wid, int hei)
     {
         if (!interactiveMode) CU_CHK(cudaMalloc((void**)(&(shaderLayers.imdata)), wid * hei * sizeof(int)));
         CU_CHK(cudaMalloc((void**)(&(shaderLayers.incident_x[0])), wid * hei * sizeof(g_real)));
@@ -33,12 +33,12 @@ namespace sharc
 
         int num_blocks_w = (userSettings.width  + (BLOCK_SIZE-1))/BLOCK_SIZE;
         int num_blocks_h = (userSettings.height + (BLOCK_SIZE-1))/BLOCK_SIZE;
-        grid_conf =  dim3(num_blocks_w, num_blocks_h);
-        block_conf = dim3(BLOCK_SIZE, BLOCK_SIZE);
+        gridConf =  dim3(num_blocks_w, num_blocks_h);
+        blockConf = dim3(BLOCK_SIZE, BLOCK_SIZE);
         K_layers<<<1,1>>>(shaderLayers);
     }
 
-    void free_frame_bufs(void)
+    void FreeFrameBuffers(void)
     {
         CU_CHK(cudaFree(shaderLayers.imdata));
         CU_CHK(cudaFree(shaderLayers.incident_x[0]));
@@ -50,7 +50,7 @@ namespace sharc
         CU_CHK(cudaFree(shaderLayers.object_id));
     }
 
-    void set_render_state(SharcSettings* settings_in)
+    void SetRenderState(SharcSettings* settings_in)
     {
         settings_in->elev_sin = sin(settings_in->cam_elev);
         settings_in->elev_cos = cos(settings_in->cam_elev);
@@ -62,13 +62,13 @@ namespace sharc
         K_settings<<<1,1>>>(*settings_in);
     }
 
-    __global__ void K_OGL_framebuffer(int* buf)
+    __global__ void K_OGLFrameBuffer(int* buf)
     {
         layers.imdata = buf;
     }
 
-    void override_OGL_framebuf(int* newBuf)
+    void OverrideOGLFrameBuffer(int* newBuf)
     {
-        K_OGL_framebuffer<<<1,1>>>(newBuf);
+        K_OGLFrameBuffer<<<1,1>>>(newBuf);
     }
 }

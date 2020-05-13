@@ -6,7 +6,7 @@
 #include "CuGLInterop.h"
 namespace sharc
 {
-    __global__ void K_rdr_test_shader()
+    __global__ void K_rdr_TestShader()
     {
         //How to best make these into macros??
         int i = blockIdx.y*blockDim.y + threadIdx.y;
@@ -21,9 +21,9 @@ namespace sharc
 		}
     }
 
-    void shader_testshader(void)
+    void Shader_TestShader(void)
     {
-        K_rdr_test_shader<<<grid_conf, block_conf>>>();
+        K_rdr_TestShader<<<gridConf, blockConf>>>();
         CU_CHK(cudaPeekAtLastError());
         CU_CHK(cudaDeviceSynchronize());
     }

@@ -11,7 +11,7 @@ namespace sharc
     class PngWriter
     {
         public:
-            void write_png(const char* filename_png_ext, const int& width, const int& height, int* imdata);
+            void WritePng(const char* filename_png_ext, const int& width, const int& height, int* imdata);
             PngWriter(void);
         private:
             bool machine_big_endian;

@@ -6,7 +6,7 @@
 #include "ShaderUtils.h"
 namespace sharc
 {
-    __global__ void K_rdr_environ_shader()
+    __global__ void K_rdr_EnvironShader()
     {
         //How to best make these into macros??
         int i = blockIdx.y*blockDim.y + threadIdx.y;
@@ -14,7 +14,7 @@ namespace sharc
         vec3 norm;
         if (i < layers.Ni && j < layers.Nj)
 		{
-            get_cam_normals(i, j, norm);
+            GetCamNormals(i, j, norm);
             *(layers.imdata + i*layers.Nj+j) = (norm[2]>0) ? settings.sky_color : settings.floor_color;
             if (settings.rdr_floor && norm[2] < 0)
             {
@@ -29,9 +29,9 @@ namespace sharc
 		}
     }
 
-    void shader_environ(void)
+    void Shader_Environ(void)
     {
-        K_rdr_environ_shader<<<grid_conf, block_conf>>>();
+        K_rdr_EnvironShader<<<gridConf, blockConf>>>();
         CU_CHK(cudaPeekAtLastError());
         CU_CHK(cudaDeviceSynchronize());
     }

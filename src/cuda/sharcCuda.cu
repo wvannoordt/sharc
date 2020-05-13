@@ -9,40 +9,40 @@
 
 namespace sharc
 {
-    void cuda_allocate_frame_buffers(void)
+    void CudaAllocateFrameBuffers(void)
     {
-        allocate_frame_bufs(userSettings.width, userSettings.height);
+        AllocateFrameBuffers(userSettings.width, userSettings.height);
     }
 
-    void cuda_set_render_state(void)
+    void CudaSetRenderState(void)
     {
-        set_render_state(&userSettings);
+        SetRenderState(&userSettings);
     }
 
-    void cuda_compute_shader(const int shader_id)
+    void CudaComputeShader(const int shader_id)
     {
         switch (shader_id)
         {
             case SHARC_SHDR_TEST:
             {
-                shader_testshader();
+                Shader_TestShader();
                 break;
             }
             case SHARC_SHDR_ENVIRON:
             {
-                shader_environ();
+                Shader_Environ();
                 break;
             }
         }
     }
 
-    void offload_image_data(int* host_endpoint)
+    void OffloadImageData(int* host_endpoint)
     {
         CU_CHK(cudaMemcpy(host_endpoint, shaderLayers.imdata, userSettings.width * userSettings.height * sizeof(int), cudaMemcpyDeviceToHost));
     }
 
-    void cuda_finalize(void)
+    void CudaFinalize(void)
     {
-        free_frame_bufs();
+        FreeFrameBuffers();
     }
 }

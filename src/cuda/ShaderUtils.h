@@ -9,7 +9,7 @@
 
 namespace sharc
 {
-    __device__ void get_cam_normals(const int& i, const int& j, vec3& n);
+    __device__ void GetCamNormals(const int& i, const int& j, vec3& n);
 }
 
 #endif
